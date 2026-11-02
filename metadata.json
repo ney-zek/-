@@ -1,0 +1,6 @@
+{
+  "name": "سِتر | Sitr - منصة الإبلاغ السري عن التنمر المدرسي",
+  "description": "منصة مدرسية آمنة ومجهولة الهوية للإبلاغ عن التنمر والعنف مع لوحة تحكم ذكية للإدارة والمرشدين التربويين.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
