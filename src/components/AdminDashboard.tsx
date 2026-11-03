@@ -63,6 +63,7 @@ import {
   Moon,
   Globe,
   Printer,
+  Cpu,
 } from 'lucide-react';
 import {
   PieChart,
@@ -83,6 +84,7 @@ import {
 } from 'recharts';
 import { Language, Theme, getTranslation, LANGUAGES } from '../lib/i18n';
 import { exportSingleReportPdf, exportAllReportsPdf } from '../lib/pdfExport';
+import { SchoolHeatmap } from './SchoolHeatmap';
 
 interface AdminDashboardProps {
   user: AdminUser;
@@ -92,6 +94,7 @@ interface AdminDashboardProps {
   onLangChange?: (lang: Language) => void;
   theme?: Theme;
   onThemeToggle?: () => void;
+  onOpenSimulation?: () => void;
 }
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({
@@ -102,6 +105,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   onLangChange,
   theme = 'dark',
   onThemeToggle,
+  onOpenSimulation,
 }) => {
   const isRtl = lang === 'ar' || lang === 'zgh';
   const isDark = theme === 'dark';
@@ -567,6 +571,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </button>
             )}
 
+            {onOpenSimulation && (
+              <button
+                onClick={onOpenSimulation}
+                className="p-1.5 rounded-lg bg-teal-950/80 text-teal-300 border border-teal-500/50 transition hover:bg-teal-900/60"
+                title="محاكاة سِتر ثلاثية الأبعاد (ESP32 ➔ Pi)"
+              >
+                <Cpu className="w-3.5 h-3.5 text-teal-400 animate-pulse" />
+              </button>
+            )}
+
             <button
               onClick={loadReports}
               className="p-1.5 rounded-lg bg-slate-800 text-teal-300 border border-slate-700 transition"
@@ -748,6 +762,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
         {/* Sidebar Footer */}
         <div className="p-4 border-t border-slate-800/80 space-y-2">
+          {onOpenSimulation && (
+            <button
+              onClick={onOpenSimulation}
+              className="w-full flex items-center justify-center gap-2 px-3 py-2.5 text-xs font-bold rounded-xl text-teal-300 bg-teal-950/60 hover:bg-teal-900/60 border border-teal-500/40 shadow-sm transition cursor-pointer"
+            >
+              <Cpu className="w-3.5 h-3.5 text-teal-400 animate-pulse" />
+              <span>محاكاة الحساس 3D (ESP32 ➔ Pi)</span>
+            </button>
+          )}
+
           <button
             onClick={onNavigateToPublic}
             className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold rounded-xl text-teal-300 bg-slate-900 hover:bg-slate-800 border border-teal-500/25 transition cursor-pointer"
@@ -1839,7 +1863,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           {/* TAB 3: HEATMAP / CAMPUS LOCATIONS MAP & TIME PERIODS ANALYTICS */}
           {activeTab === 'heatmap' && (
             <div className="space-y-6">
-              {/* Top Analytics Panel: Time Periods Analysis */}
+              {/* Comprehensive Architectural School Heatmap */}
+              <SchoolHeatmap
+                reports={reports}
+                lang={lang}
+                onSelectReport={(report) => {
+                  setSelectedReport(report);
+                  setActiveTab('reports');
+                }}
+                onOpenSimulation={onOpenSimulation}
+              />
+
+              {/* Time Periods Analysis Panel */}
               <div className="bg-[#0b142c] border border-slate-800 rounded-3xl p-5 sm:p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className="text-start">
@@ -1898,111 +1933,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       </p>
                     </div>
                   </div>
-                </div>
-              </div>
-
-              {/* Campus Locations Hotspots */}
-              <div className="bg-[#0b142c] border border-slate-800 rounded-3xl p-5 sm:p-6 space-y-6">
-                <div className="text-start">
-                  <h3 className="text-lg font-bold text-white mb-1">
-                    {getTranslation(lang, 'campusHotspotsTitle')}
-                  </h3>
-                  <p className="text-xs text-slate-400">
-                    {getTranslation(lang, 'campusHotspotsSub')}
-                  </p>
-                </div>
-
-                {reports.length === 0 && (
-                  <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 text-start flex items-center gap-3">
-                    <div className="p-2 rounded-xl bg-teal-500/10 text-teal-400 shrink-0">
-                      <CheckCircle className="w-5 h-5 text-teal-400" />
-                    </div>
-                    <div>
-                      <h4 className="text-xs font-bold text-white mb-0.5">
-                        {getTranslation(lang, 'emptyReportsTitle')}
-                      </h4>
-                      <p className="text-[11px] text-slate-400 leading-relaxed">
-                        {getTranslation(lang, 'emptyReportsSub')}
-                      </p>
-                    </div>
-                  </div>
-                )}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {[
-                    {
-                      name: getTranslation(lang, 'locYard'),
-                      key: 'ساحة',
-                      count: reports.filter((r) => r.location === 'ساحة' || r.location === getTranslation(lang, 'locYard')).length,
-                      risk: getTranslation(lang, 'riskHigh'),
-                      riskColor: 'rose',
-                    },
-                    {
-                      name: getTranslation(lang, 'locCorridor'),
-                      key: 'ممر',
-                      count: reports.filter((r) => r.location === 'ممر' || r.location === getTranslation(lang, 'locCorridor')).length,
-                      risk: getTranslation(lang, 'riskMedium'),
-                      riskColor: 'amber',
-                    },
-                    {
-                      name: getTranslation(lang, 'locRestroom'),
-                      key: 'حمام',
-                      count: reports.filter((r) => r.location === 'حمام' || r.location === getTranslation(lang, 'locRestroom')).length,
-                      risk: getTranslation(lang, 'riskCritical'),
-                      riskColor: 'rose',
-                    },
-                    {
-                      name: getTranslation(lang, 'locClassroom'),
-                      key: 'قسم',
-                      count: reports.filter((r) => r.location === 'قسم' || r.location === getTranslation(lang, 'locClassroom')).length,
-                      risk: getTranslation(lang, 'riskMedium'),
-                      riskColor: 'amber',
-                    },
-                    {
-                      name: getTranslation(lang, 'locOther'),
-                      key: 'أخرى',
-                      count: reports.filter((r) => r.type === 'cyber' || r.location.startsWith('أخرى') || r.location.startsWith(getTranslation(lang, 'locOther'))).length,
-                      risk: getTranslation(lang, 'riskHigh'),
-                      riskColor: 'cyan',
-                    },
-                    {
-                      name: getTranslation(lang, 'locLibrary'),
-                      key: 'مكتبة',
-                      count: reports.filter((r) => r.location === 'مكتبة' || r.location === getTranslation(lang, 'locLibrary')).length,
-                      risk: getTranslation(lang, 'riskLow'),
-                      riskColor: 'emerald',
-                    },
-                  ].map((zone) => (
-                    <div
-                      key={zone.name}
-                      className="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 text-start flex flex-col justify-between"
-                    >
-                      <div>
-                        <div className="flex items-center justify-between mb-3">
-                          <span
-                            className={`text-xs font-bold px-2.5 py-0.5 rounded-full ${
-                              zone.riskColor === 'rose'
-                                ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
-                                : zone.riskColor === 'amber'
-                                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                                : zone.riskColor === 'cyan'
-                                ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
-                                : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                            }`}
-                          >
-                            {zone.risk}
-                          </span>
-                          <div className="flex items-center gap-1.5 text-teal-400 font-black text-sm">
-                            <MapPin className="w-4 h-4" />
-                            <span>{zone.count} {getTranslation(lang, 'reportsCountWord')}</span>
-                          </div>
-                        </div>
-
-                        <h4 className="font-bold text-base text-white mb-1.5">
-                          {zone.name}
-                        </h4>
-                      </div>
-                    </div>
-                  ))}
                 </div>
               </div>
             </div>

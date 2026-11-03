@@ -16,6 +16,7 @@ import {
   Lock,
   ChevronDown,
   User,
+  Cpu,
 } from 'lucide-react';
 import { motion } from 'motion/react';
 
@@ -23,9 +24,10 @@ interface PublicReportFormProps {
   onNavigateToLogin: () => void;
   lang: Language;
   theme: Theme;
+  onOpenSimulation?: () => void;
 }
 
-export const PublicReportForm: React.FC<PublicReportFormProps> = ({ onNavigateToLogin, lang, theme }) => {
+export const PublicReportForm: React.FC<PublicReportFormProps> = ({ onNavigateToLogin, lang, theme, onOpenSimulation }) => {
   const [bullyingType, setBullyingType] = useState<BullyingType>('verbal');
   const [location, setLocation] = useState<string>('ساحة');
   const [customLocation, setCustomLocation] = useState<string>('');
@@ -167,6 +169,23 @@ export const PublicReportForm: React.FC<PublicReportFormProps> = ({ onNavigateTo
           <Shield className="w-3.5 h-3.5 text-teal-400" />
           <span>بلاغ مشفر ومجهول الهوية بالكامل - لن يعرف أحد هويتك</span>
         </div>
+
+        {/* 3D Hardware Simulation Callout (ESP32 ➔ Raspberry Pi) */}
+        {onOpenSimulation && (
+          <div className="mt-4 flex justify-center">
+            <button
+              type="button"
+              onClick={onOpenSimulation}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-gradient-to-r from-teal-950/90 to-slate-900/90 hover:from-teal-900/80 hover:to-slate-800/80 border border-teal-500/40 text-teal-200 text-xs sm:text-sm font-bold shadow-lg shadow-teal-950/40 transition-all cursor-pointer group hover:scale-[1.01]"
+            >
+              <Cpu className="w-4 h-4 text-teal-400 animate-pulse group-hover:scale-110 transition-transform" />
+              <span>محاكاة معمارية الأجهزة 3D: رصد العنف عبر ESP32 ونقل البيانات للـ Raspberry Pi</span>
+              <span className="text-[10px] bg-teal-500/20 text-teal-300 px-2 py-0.5 rounded-full font-mono border border-teal-500/30">
+                3D Interactive
+              </span>
+            </button>
+          </div>
+        )}
       </motion.div>
 
       {/* Main Reporting Form Card */}

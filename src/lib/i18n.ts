@@ -17,7 +17,7 @@ export const LANGUAGES: LanguageInfo[] = [
 
 export const translations: Record<Language, Record<string, string>> = {
   ar: {
-    appName: 'سِتْــر',
+    appName: 'SchoolShield',
     tagline: 'منصة الإبلاغ الآمن عن التنمر والعنف المدرسي',
     publicReport: 'تقديم بلاغ',
     adminLogin: 'دخول الإدارة',

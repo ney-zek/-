@@ -5,6 +5,7 @@ import { AdminLogin } from './components/AdminLogin';
 import { AdminDashboard } from './components/AdminDashboard';
 import { EmergencyModal } from './components/EmergencyModal';
 import { Footer } from './components/Footer';
+import { Esp32PiSimulation } from './components/Esp32PiSimulation';
 import { AdminUser } from './types';
 import { Language, Theme } from './lib/i18n';
 
@@ -12,6 +13,7 @@ export default function App() {
   const [currentView, setCurrentView] = useState<'public' | 'login' | 'admin'>('public');
   const [adminUser, setAdminUser] = useState<AdminUser | null>(null);
   const [isEmergencyModalOpen, setIsEmergencyModalOpen] = useState<boolean>(false);
+  const [isSimulationOpen, setIsSimulationOpen] = useState<boolean>(false);
   const [lang, setLang] = useState<Language>('ar');
   const [theme, setTheme] = useState<Theme>('dark');
 
@@ -92,6 +94,7 @@ export default function App() {
           onLangChange={handleLangChange}
           theme={theme}
           onThemeToggle={handleThemeToggle}
+          onOpenSimulation={() => setIsSimulationOpen(true)}
         />
       )}
 
@@ -102,6 +105,7 @@ export default function App() {
             onNavigateToLogin={() => setCurrentView('login')}
             lang={lang}
             theme={theme}
+            onOpenSimulation={() => setIsSimulationOpen(true)}
           />
         )}
 
@@ -122,6 +126,7 @@ export default function App() {
             onLangChange={handleLangChange}
             theme={theme}
             onThemeToggle={handleThemeToggle}
+            onOpenSimulation={() => setIsSimulationOpen(true)}
           />
         )}
       </main>
@@ -145,6 +150,15 @@ export default function App() {
         onClose={() => setIsEmergencyModalOpen(false)}
         lang={lang}
       />
+
+      {/* 3D Hardware Simulation Modal: ESP32 ➔ Raspberry Pi */}
+      {isSimulationOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/85 backdrop-blur-md animate-fade-in">
+          <div className="w-full max-w-5xl h-[92vh] max-h-[860px]">
+            <Esp32PiSimulation onClose={() => setIsSimulationOpen(false)} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
